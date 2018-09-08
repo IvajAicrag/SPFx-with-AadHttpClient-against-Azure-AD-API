@@ -2,13 +2,21 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "spfx-client-side-solution",
-    "id": "f7f35654-3a16-4785-99cd-45fd5ef64425",
+    "id": "0119dd3e-cb7e-4957-ad33-23f57766846d",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "webApiPermissionRequests": [
       {
         "resource": "api-sso",
         "scope": "user_impersonation"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "scope": "User.ReadBasic.All"
+      },
+      {
+        "resource": "Windows Azure Active Directory",
+        "scope": "User.Read"
       }
     ]
   },

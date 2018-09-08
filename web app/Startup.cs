@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,23 +23,23 @@ namespace WebApp_OpenIDConnect_DotNet
         {
             services.AddAuthentication(sharedOptions =>
             {
-                sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                sharedOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddAzureAd(options => Configuration.Bind("AzureAd", options))
-            .AddCookie();
+            .AddJwtBearer(options =>
+            {
+                options.Audience = Configuration.GetSection("AzureAd")["ClientId"];
+                options.Authority = $"{Configuration.GetSection("AzureAd")["Instance"]}{Configuration.GetSection("AzureAd")["TenantId"]}";
+            });
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin",
+                options.AddPolicy("AllOrigins",
                     builder =>
                     {
                         builder
-                            .WithOrigins(
-                                "https://localhost:4321") // after deployment this should be changed to real web app url
+                            .AllowAnyOrigin()
                             .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
+                            .AllowAnyHeader();
                     });
             });
 
@@ -61,7 +62,7 @@ namespace WebApp_OpenIDConnect_DotNet
 
             app.UseAuthentication();
 
-            app.UseCors("AllowSpecificOrigin");
+            app.UseCors("AllOrigins");
 
             app.UseMvc(routes =>
             {

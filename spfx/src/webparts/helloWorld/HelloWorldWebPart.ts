@@ -17,21 +17,22 @@ export interface IHelloWorldWebPartProps {
 export default class HelloWorldWebPart extends BaseClientSideWebPart<IHelloWorldWebPartProps> {
 
   public render(): void {
-
     this.domElement.innerHTML = `
-      <div class="${ styles.helloWorld }">
+      <div class="${ styles.helloWorld}">
         hello world
       </div>`;
 
-    let client = new AadHttpClient(this.context.serviceScope, '6fc2655e-04cd-437d-a50d-0c1a31383775');
-
-      client.get('https://localhost:44361/api/clients', AadHttpClient.configurations.v1)
+    this.context.aadHttpClientFactory.getClient('6fc2655e-04cd-437d-a50d-0c1a31383775')
+      .then((client: AadHttpClient) => {
+        return client.get('https://localhost:44361/api/clients', AadHttpClient.configurations.v1);
+      })
       .then((res: HttpClientResponse): Promise<any> => {
         return res.json();
       })
       .then(data => {
         console.log(data);
       })
+      .catch(console.log);
   }
 
   protected get dataVersion(): Version {
